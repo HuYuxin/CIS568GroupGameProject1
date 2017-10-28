@@ -40,5 +40,6 @@ public:
 
 	FTimerHandle timerHandle;
 	void destroyABlock();
+	void destroyABlock(int x, int y);
 	
 };

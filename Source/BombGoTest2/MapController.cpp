@@ -121,6 +121,11 @@ void AMapController::destroyABlock() {
 		blockRecord[y][x]->destroyBlock();
 	}
 }
+void AMapController::destroyABlock(int x, int y) {
 
+	if (blockRecord[y][x] != NULL) {
+		blockRecord[y][x]->destroyBlock();
+	}
+}
 
 
