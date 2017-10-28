@@ -19,6 +19,18 @@ AMapController::AMapController()
 	if (MapBlock.Object) {
 		mapFloorTileClass = (UClass*)MapFloorTile.Object->GeneratedClass;
 	}
+	initializeMapRecord();
+}
+
+//Initialize the 2D map with null pointers
+void AMapController::initializeMapRecord() {
+	for (int row = 0; row < YSIZE; row++) {
+		TArray<AMapBlock*> StringArray;
+		for (int col = 0; col < XSIZE; col++) {
+			StringArray.Add(NULL);
+		}
+		blockRecord.Add(StringArray);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -27,7 +39,7 @@ void AMapController::BeginPlay()
 	Super::BeginPlay();
 	buildFloor();
 	placeBlocks();
-	
+	GetWorldTimerManager().SetTimer(timerHandle, this, &AMapController::destroyABlock, 5.0f, false);
 }
 
 // Called every frame
@@ -37,24 +49,20 @@ void AMapController::Tick(float DeltaTime)
 
 }
 
+
 void AMapController::buildFloor() {
 	UWorld* const World = GetWorld();
 	if (World) {
-		int xSize = 16;
-		int ySize = 16;
-		int tileSize = 100;
-		for (int i = 0; i < xSize * ySize; i++) {
-			float x = (i / ySize) * tileSize;
-			float y = (i % ySize) * tileSize;
+		for (int i = 0; i < XSIZE * YSIZE; i++) {
+			float x = (i / YSIZE) * TILESIZE;
+			float y = (i % YSIZE) * TILESIZE;
 			AMapFloorTile* floorTile = World->SpawnActor<AMapFloorTile>(mapFloorTileClass, FVector(x, y, 0), FRotator(0.f));
 		}
-
 	}
 }
 
 void AMapController::placeBlocks() {
 	UWorld* const World = GetWorld();
-	int tileSize = 100;
 	if (World) {
 		//FString projectDir = FPaths::GameDir();
 		//projectDir += "Content/MapData.txt";
@@ -76,18 +84,40 @@ void AMapController::placeBlocks() {
 				data.ParseIntoArray(xyPos, TEXT(","), false);
 				int xShift = FCString::Atoi(*(xyPos[0]));
 				int yShift = FCString::Atoi(*(xyPos[1]));
-				AMapBlock* block = (AMapBlock*) World->SpawnActor<AMapBlock>(mapBlockClass, FVector(xShift * tileSize, yShift * tileSize, 0), FRotator(0.f));
 				
+				AMapBlock* block = (AMapBlock*) World->SpawnActor<AMapBlock>(mapBlockClass, FVector(xShift * TILESIZE, yShift * TILESIZE, 0), FRotator(0.f));
+				FLinearColor blockColor = FLinearColor();
+				if (xyPos.Num() > 2) {
+					//this is a stronghold
+					block->initBlock(BlockTypeEnum::BT_StrongHold, 0);
+					blockColor = FLinearColor::Red;
+				}
+				else {
+					//this is a normal block
+					block->initBlock(BlockTypeEnum::BT_Normal, 0);
+					blockColor = FLinearColor::Green;
+				}
+
 				//Assign a color to static mesh component (which is a block)
 				TArray<UStaticMeshComponent*> staticMeshComponents;
 				block->GetComponents<UStaticMeshComponent>(staticMeshComponents);
 				UStaticMeshComponent* component = staticMeshComponents[0];
 				UMaterialInstanceDynamic * DynamicMaterial = UMaterialInstanceDynamic::Create(component->GetMaterial(0), nullptr);
-				DynamicMaterial->SetVectorParameterValue("Color", FLinearColor::Blue);
+				DynamicMaterial->SetVectorParameterValue("Color", blockColor);
 				component->SetMaterial(0, DynamicMaterial);
-				//Assign a color to static mesh component
+
+				//Add this pointer to the 2D blockMap
+				blockRecord[yShift][xShift] = block;
 			}
 		}
+	}
+}
+
+void AMapController::destroyABlock() {
+	int x = 13;
+	int y = 15;
+	if (blockRecord[y][x] != NULL) {
+		blockRecord[y][x]->destroyBlock();
 	}
 }
 
