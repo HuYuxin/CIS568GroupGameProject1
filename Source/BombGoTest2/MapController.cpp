@@ -66,7 +66,8 @@ void AMapController::placeBlocks() {
 	if (World) {
 		//FString projectDir = FPaths::GameDir();
 		//projectDir += "Content/MapData.txt";
-		FString projectDir = "C:/Users/Yuxin Hu/Documents/Unreal Projects/BombGoTest2/Content/MapData.txt";
+		FString dataMapFilePath = FPaths::ConvertRelativePathToFull(FPaths::GameDir());
+		FString projectDir = dataMapFilePath+"Content/MapData.txt";
 		if (!FPlatformFileManager::Get().GetPlatformFile().FileExists(*projectDir))
 		{
 			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("** Could not Find File **"));
