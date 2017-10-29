@@ -7,6 +7,8 @@
 #include "MapBlock.h"
 #include "MapFloorTile.h"
 #include "MapBoundary.h"
+#include "SoundDefinitions.h"
+#include "Sound/SoundCue.h"
 #include "MapController.generated.h"
 
 UCLASS()
@@ -28,6 +30,7 @@ private:
 	const int TILESIZE = 100;
 	TArray<TArray<AMapBlock*>> blockRecord;
 	void initializeMapRecord();
+	bool inBound(int x, int y);
 
 public:	
 	// Called every frame
@@ -37,11 +40,17 @@ public:
 	TSubclassOf<class AMapBlock> mapBlockClass;
 	TSubclassOf<class AMapFloorTile> mapFloorTileClass;
 	TSubclassOf<class AMapBoundary> mapBoundaryClass;
+	TSubclassOf<class AActor> Explosion;
+	USoundCue* explosionSoundCue;
 	void buildFloor();
 	void placeBlocks();
 	void buildBoundary();
+	
 
 	FTimerHandle timerHandle;
-	void destroyABlock();
+	//void destroyABlock();
 	
+	UFUNCTION(BlueprintCallable, Category = "MapController")
+	void destroyABlock(float xPos, float yPos);
+	void makeAnExplosion(int xGrid, int yGrid);
 };

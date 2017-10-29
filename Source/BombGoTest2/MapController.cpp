@@ -3,6 +3,7 @@
 #include "MapController.h"
 #include "ConstructorHelpers.h"
 #include "PlatformFilemanager.h"
+#include "Kismet/GameplayStatics.h"
 #include "CoreMisc.h"
 
 
@@ -22,6 +23,15 @@ AMapController::AMapController()
 	static ConstructorHelpers::FObjectFinder<UBlueprint> MapBoundary(TEXT("Blueprint'/Game/MapBoundaryBP.MapBoundaryBP'"));
 	if (MapBoundary.Object) {
 		mapBoundaryClass = (UClass*)MapBoundary.Object->GeneratedClass;
+	}
+	static ConstructorHelpers::FObjectFinder<UBlueprint> FindExplosion(TEXT("Blueprint'/Game/ExplosionBP.ExplosionBP'"));
+	if (FindExplosion.Object) {
+		Explosion = (UClass*)FindExplosion.Object->GeneratedClass;
+	}
+	static ConstructorHelpers::FObjectFinder<USoundCue> explosionSound(TEXT("SoundCue'/Game/ExplosionSound.ExplosionSound'"));
+	if (explosionSound.Object != NULL)
+	{
+		explosionSoundCue = (USoundCue*)explosionSound.Object;
 	}
 	initializeMapRecord();
 }
@@ -122,13 +132,13 @@ void AMapController::placeBlocks() {
 void AMapController::buildBoundary() {
 	UWorld* const World = GetWorld();
 	if (World) {
-		/*for (int i = 0; i < XSIZE; i++) {
+		for (int i = 0; i < XSIZE; i++) {
 			float y = i * TILESIZE;
-			AMapBoundary* floorTile = World->SpawnActor<AMapBoundary>(mapBoundaryClass, FVector(-TILESIZE/2, y, TILESIZE / 2), FRotator(90.0f, 0, 0));
+			AMapBoundary* floorTile = World->SpawnActor<AMapBoundary>(mapBoundaryClass, FVector(-TILESIZE/2, y, TILESIZE / 2), FRotator(-90.0f, 0, 0));
 		}
 		for (int i = 0; i < XSIZE; i++) {
 			float y = i * TILESIZE;
-			AMapBoundary* floorTile = World->SpawnActor<AMapBoundary>(mapBoundaryClass, FVector((XSIZE-1+0.5)*TILESIZE, y, TILESIZE / 2), FRotator(-90.0f, 0, 0));
+			AMapBoundary* floorTile = World->SpawnActor<AMapBoundary>(mapBoundaryClass, FVector((XSIZE-1+0.5)*TILESIZE, y, TILESIZE / 2), FRotator(90.0f, 0, 0));
 		}
 		for (int i = 0; i < XSIZE; i++) {
 			float x = i * TILESIZE;
@@ -137,15 +147,88 @@ void AMapController::buildBoundary() {
 		for (int i = 0; i < XSIZE; i++) {
 			float x = i * TILESIZE;
 			AMapBoundary* floorTile = World->SpawnActor<AMapBoundary>(mapBoundaryClass, FVector(x, (YSIZE - 1 + 0.5)*TILESIZE, TILESIZE / 2), FRotator(0, 0, -90.0f));
-		}*/
+		}
 	}
 }
 
-void AMapController::destroyABlock() {
+/*void AMapController::destroyABlock() {
 	int x = 13;
 	int y = 15;
 	if (blockRecord[y][x] != NULL) {
 		blockRecord[y][x]->destroyBlock();
+	}
+}*/
+
+bool AMapController::inBound(int x, int y) {
+	if ((x < XSIZE && x >= 0) && (y < YSIZE && y >= 0)) {
+		return true;
+	}else{
+		return false;
+	}
+}
+
+void AMapController::makeAnExplosion(int xGrid, int yGrid) {
+	UWorld* const World = GetWorld();
+	if (World) {
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = Instigator;
+		World->SpawnActor<AActor>(Explosion, FVector(xGrid*TILESIZE, yGrid *TILESIZE, 0), FRotator(0, 0, 0), SpawnParams);
+		UGameplayStatics::PlaySoundAtLocation(World, explosionSoundCue, FVector(xGrid*TILESIZE, yGrid *TILESIZE, 0));
+	}
+}
+
+void AMapController::destroyABlock(float xPos, float yPos) {
+	int xGrid = (xPos + TILESIZE/2) / TILESIZE;
+	int yGrid = (yPos + TILESIZE/2) / TILESIZE;
+	
+	//xGrid represents which column, yGrid represents which row
+	//grid below bomb
+	if (inBound(xGrid, yGrid + 1)) {
+		if (IsValid(blockRecord[yGrid + 1][xGrid])) {
+			blockRecord[yGrid + 1][xGrid]->destroyBlock();
+			blockRecord[yGrid + 1][xGrid] = NULL;
+		}
+		else {
+			//emit an explosion class
+			makeAnExplosion(xGrid, yGrid + 1);
+		}
+	}
+	
+	//grid above bomb
+	if (inBound(xGrid, yGrid - 1)) {
+		if (IsValid(blockRecord[yGrid - 1][xGrid])) {
+			blockRecord[yGrid - 1][xGrid]->destroyBlock();
+			blockRecord[yGrid - 1][xGrid] = NULL;
+		}
+		else {
+			//emit an explosion class
+			makeAnExplosion(xGrid, yGrid - 1);
+		}
+	}
+
+	//grid on left of bomb
+	if (inBound(xGrid - 1, yGrid)) {
+		if (IsValid(blockRecord[yGrid][xGrid - 1])) {
+			blockRecord[yGrid][xGrid - 1]->destroyBlock();
+			blockRecord[yGrid][xGrid - 1] = NULL;
+		}
+		else {
+			//emit an explosion class
+			makeAnExplosion(xGrid-1, yGrid);
+		}
+	}
+
+	//grid on right of bomb
+	if (inBound(xGrid + 1, yGrid)) {
+		if (IsValid(blockRecord[yGrid][xGrid + 1])) {
+			blockRecord[yGrid][xGrid + 1]->destroyBlock();
+			blockRecord[yGrid][xGrid + 1] = NULL;
+		}
+		else {
+			//emit an explosion class
+			makeAnExplosion(xGrid + 1, yGrid);
+		}
 	}
 }
 

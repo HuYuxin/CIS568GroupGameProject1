@@ -43,9 +43,8 @@ void AMapBlock::initBlock(BlockTypeEnum Type, int Resource) {
 
 void AMapBlock::destroyBlock() {
 	Destroy();
-
-	UWorld* const World = GetWorld();
-	if (World) {
+	if (GetWorld()) {
+		UWorld* const World = GetWorld();
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = this;
 		SpawnParams.Instigator = Instigator;
