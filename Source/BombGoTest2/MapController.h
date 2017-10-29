@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "MapBlock.h"
 #include "MapFloorTile.h"
+#include "MapBoundary.h"
 #include "MapController.generated.h"
 
 UCLASS()
@@ -35,8 +36,10 @@ public:
 	//Initialize the game map
 	TSubclassOf<class AMapBlock> mapBlockClass;
 	TSubclassOf<class AMapFloorTile> mapFloorTileClass;
+	TSubclassOf<class AMapBoundary> mapBoundaryClass;
 	void buildFloor();
 	void placeBlocks();
+	void buildBoundary();
 
 	FTimerHandle timerHandle;
 	void destroyABlock();

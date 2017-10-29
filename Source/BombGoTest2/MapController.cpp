@@ -19,6 +19,10 @@ AMapController::AMapController()
 	if (MapBlock.Object) {
 		mapFloorTileClass = (UClass*)MapFloorTile.Object->GeneratedClass;
 	}
+	static ConstructorHelpers::FObjectFinder<UBlueprint> MapBoundary(TEXT("Blueprint'/Game/MapBoundaryBP.MapBoundaryBP'"));
+	if (MapBoundary.Object) {
+		mapBoundaryClass = (UClass*)MapBoundary.Object->GeneratedClass;
+	}
 	initializeMapRecord();
 }
 
@@ -39,7 +43,8 @@ void AMapController::BeginPlay()
 	Super::BeginPlay();
 	buildFloor();
 	placeBlocks();
-	GetWorldTimerManager().SetTimer(timerHandle, this, &AMapController::destroyABlock, 5.0f, false);
+	buildBoundary();
+	//GetWorldTimerManager().SetTimer(timerHandle, this, &AMapController::destroyABlock, 5.0f, false);
 }
 
 // Called every frame
@@ -111,6 +116,28 @@ void AMapController::placeBlocks() {
 				blockRecord[yShift][xShift] = block;
 			}
 		}
+	}
+}
+
+void AMapController::buildBoundary() {
+	UWorld* const World = GetWorld();
+	if (World) {
+		/*for (int i = 0; i < XSIZE; i++) {
+			float y = i * TILESIZE;
+			AMapBoundary* floorTile = World->SpawnActor<AMapBoundary>(mapBoundaryClass, FVector(-TILESIZE/2, y, TILESIZE / 2), FRotator(90.0f, 0, 0));
+		}
+		for (int i = 0; i < XSIZE; i++) {
+			float y = i * TILESIZE;
+			AMapBoundary* floorTile = World->SpawnActor<AMapBoundary>(mapBoundaryClass, FVector((XSIZE-1+0.5)*TILESIZE, y, TILESIZE / 2), FRotator(-90.0f, 0, 0));
+		}
+		for (int i = 0; i < XSIZE; i++) {
+			float x = i * TILESIZE;
+			AMapBoundary* floorTile = World->SpawnActor<AMapBoundary>(mapBoundaryClass, FVector(x, -TILESIZE / 2, TILESIZE / 2), FRotator(0, 0, 90.0f));
+		}
+		for (int i = 0; i < XSIZE; i++) {
+			float x = i * TILESIZE;
+			AMapBoundary* floorTile = World->SpawnActor<AMapBoundary>(mapBoundaryClass, FVector(x, (YSIZE - 1 + 0.5)*TILESIZE, TILESIZE / 2), FRotator(0, 0, -90.0f));
+		}*/
 	}
 }
 
