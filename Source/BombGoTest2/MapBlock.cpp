@@ -49,7 +49,7 @@ void AMapBlock::destroyBlock() {
 		SpawnParams.Owner = this;
 		SpawnParams.Instigator = Instigator;
 		World->SpawnActor<AActor>(Explosion, GetActorLocation(), GetActorRotation(), SpawnParams);
-		UGameplayStatics::PlaySoundAtLocation(World, explosionSoundCue, GetActorLocation());
+		//UGameplayStatics::PlaySoundAtLocation(World, explosionSoundCue, GetActorLocation());
 	}
 }
 

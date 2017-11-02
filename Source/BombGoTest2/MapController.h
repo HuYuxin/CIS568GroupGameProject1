@@ -11,6 +11,7 @@
 #include "Sound/SoundCue.h"
 #include "MapController.generated.h"
 
+
 UCLASS()
 class BOMBGOTEST2_API AMapController : public AActor
 {
@@ -28,9 +29,14 @@ private:
 	const int XSIZE = 16;
 	const int YSIZE = 16;
 	const int TILESIZE = 100;
-	TArray<TArray<AMapBlock*>> blockRecord;
-	void initializeMapRecord();
-	bool inBound(int x, int y);
+	
+	//TArray<TArray<AMapBlock*>> blockRecord;
+
+	//bool inBound(int x, int y);
+	
+	/*UFUNCTION(reliable, server, WithValidation)
+	void initializeMapRecord();*/
+
 
 public:	
 	// Called every frame
@@ -42,15 +48,21 @@ public:
 	TSubclassOf<class AMapBoundary> mapBoundaryClass;
 	TSubclassOf<class AActor> Explosion;
 	USoundCue* explosionSoundCue;
+
+	UFUNCTION(reliable, server, WithValidation)
 	void buildFloor();
+
+	UFUNCTION(reliable, server, WithValidation)
 	void placeBlocks();
+
+	UFUNCTION(reliable, server, WithValidation)
 	void buildBoundary();
 	
 
 	FTimerHandle timerHandle;
 	//void destroyABlock();
 	
-	UFUNCTION(BlueprintCallable, Category = "MapController")
-	void destroyABlock(float xPos, float yPos);
-	void makeAnExplosion(int xGrid, int yGrid);
+	//UFUNCTION(BlueprintCallable, Category = "MapController")
+	//void destroyABlock(float xPos, float yPos);
+	//void makeAnExplosion(int xGrid, int yGrid);
 };

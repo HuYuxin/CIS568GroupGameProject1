@@ -34,7 +34,7 @@ public:
 		BlockTypeEnum blockType;
 	//void initBlock(int Type, int Resource);
 	void initBlock(BlockTypeEnum Type, int Resource);
-	UFUNCTION() 
+	UFUNCTION(BlueprintCallable, Category = "MapBlock")
 		void destroyBlock();
 	
 	TSubclassOf<class AActor> Explosion;
