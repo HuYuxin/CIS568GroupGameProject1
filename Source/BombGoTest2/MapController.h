@@ -7,6 +7,7 @@
 #include "MapBlock.h"
 #include "MapFloorTile.h"
 #include "MapBoundary.h"
+#include "Stronghold.h"
 #include "SoundDefinitions.h"
 #include "Sound/SoundCue.h"
 #include "MapController.generated.h"
@@ -46,6 +47,7 @@ public:
 	TSubclassOf<class AMapBlock> mapBlockClass;
 	TSubclassOf<class AMapFloorTile> mapFloorTileClass;
 	TSubclassOf<class AMapBoundary> mapBoundaryClass;
+	TSubclassOf<class AStronghold> strongholdClass;
 	TSubclassOf<class AActor> Explosion;
 	USoundCue* explosionSoundCue;
 
