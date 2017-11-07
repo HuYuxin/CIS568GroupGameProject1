@@ -25,6 +25,10 @@ AMapController::AMapController()
 	if (MapBoundary.Object) {
 		mapBoundaryClass = (UClass*)MapBoundary.Object->GeneratedClass;
 	}
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Stronghold(TEXT("Blueprint'/Game/StrongholdBP.StrongholdBP'"));
+	if (Stronghold.Object) {
+		strongholdClass = (UClass*)Stronghold.Object->GeneratedClass;
+	}
 	static ConstructorHelpers::FObjectFinder<UBlueprint> FindExplosion(TEXT("Blueprint'/Game/ExplosionBP.ExplosionBP'"));
 	if (FindExplosion.Object) {
 		Explosion = (UClass*)FindExplosion.Object->GeneratedClass;
@@ -109,26 +113,31 @@ void AMapController::placeBlocks_Implementation() {
 				int xShift = FCString::Atoi(*(xyPos[0]));
 				int yShift = FCString::Atoi(*(xyPos[1]));
 				
-				AMapBlock* block = (AMapBlock*) World->SpawnActor<AMapBlock>(mapBlockClass, FVector(xShift * TILESIZE, yShift * TILESIZE, 0), FRotator(0.f));
-				FLinearColor blockColor = FLinearColor();
+				
 				if (xyPos.Num() > 2) {
 					//this is a stronghold
-					block->initBlock(BlockTypeEnum::BT_StrongHold, 0);
-					blockColor = FLinearColor::Red;
+					AStronghold* stronghold = (AStronghold*)World->SpawnActor<AStronghold>(strongholdClass, FVector(xShift * TILESIZE, yShift * TILESIZE, 0), FRotator(0.f));
+					FLinearColor blockColor = FLinearColor();
+					if (xShift > 8) {
+						blockColor = FLinearColor::Red;
+					}
+					else {
+						blockColor = FLinearColor::Blue;
+					}
+					TArray<UStaticMeshComponent*> staticMeshComponents;
+					stronghold->GetComponents<UStaticMeshComponent>(staticMeshComponents);
+					UStaticMeshComponent* component = staticMeshComponents[0];
+					UMaterialInstanceDynamic * DynamicMaterial = UMaterialInstanceDynamic::Create(component->GetMaterial(0), nullptr);
+					DynamicMaterial->SetVectorParameterValue("Color", blockColor);
+					component->SetMaterial(0, DynamicMaterial);
 				}
 				else {
 					//this is a normal block
+					AMapBlock* block = (AMapBlock*)World->SpawnActor<AMapBlock>(mapBlockClass, FVector(xShift * TILESIZE, yShift * TILESIZE, 0), FRotator(0.f));
 					block->initBlock(BlockTypeEnum::BT_Normal, 0);
-					blockColor = FLinearColor::Green;
 				}
 
 				//Assign a color to static mesh component (which is a block)
-				/*TArray<UStaticMeshComponent*> staticMeshComponents;
-				block->GetComponents<UStaticMeshComponent>(staticMeshComponents);
-				UStaticMeshComponent* component = staticMeshComponents[0];
-				UMaterialInstanceDynamic * DynamicMaterial = UMaterialInstanceDynamic::Create(component->GetMaterial(0), nullptr);
-				DynamicMaterial->SetVectorParameterValue("Color", blockColor);
-				component->SetMaterial(0, DynamicMaterial);*/
 
 				//Add this pointer to the 2D blockMap
 				//blockRecord[yShift][xShift] = block;
