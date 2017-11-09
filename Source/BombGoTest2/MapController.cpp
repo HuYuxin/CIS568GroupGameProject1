@@ -116,8 +116,10 @@ void AMapController::placeBlocks_Implementation() {
 				
 				if (xyPos.Num() > 2) {
 					//this is a stronghold
+					int idx= FCString::Atoi(*(xyPos[2]));
 					AStronghold* stronghold = (AStronghold*)World->SpawnActor<AStronghold>(strongholdClass, FVector(xShift * TILESIZE, yShift * TILESIZE, 0), FRotator(0.f));
 					FLinearColor blockColor = FLinearColor();
+					stronghold->id = idx;
 					if (xShift > 8) {
 						blockColor = FLinearColor::Red;
 					}

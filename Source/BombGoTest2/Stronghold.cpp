@@ -10,7 +10,6 @@ AStronghold::AStronghold()
 	PrimaryActorTick.bCanEverTick = true;
 
 }
-
 // Called when the game starts or when spawned
 void AStronghold::BeginPlay()
 {

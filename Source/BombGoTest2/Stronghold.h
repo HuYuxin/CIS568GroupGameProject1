@@ -14,7 +14,8 @@ class BOMBGOTEST2_API AStronghold : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AStronghold();
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
+		int id;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
