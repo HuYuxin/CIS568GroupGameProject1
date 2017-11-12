@@ -59,6 +59,9 @@ public:
 
 	UFUNCTION(reliable, server, WithValidation)
 	void buildBoundary();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void changeStrongholdColor(AStronghold* stronghold, FLinearColor blockColor);
 	
 
 	FTimerHandle timerHandle;
