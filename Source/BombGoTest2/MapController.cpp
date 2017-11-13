@@ -126,12 +126,14 @@ void AMapController::placeBlocks_Implementation() {
 					else {
 						blockColor = FLinearColor::Blue;
 					}
-					TArray<UStaticMeshComponent*> staticMeshComponents;
+					changeStrongholdColor(stronghold, blockColor);
+
+					/*TArray<UStaticMeshComponent*> staticMeshComponents;
 					stronghold->GetComponents<UStaticMeshComponent>(staticMeshComponents);
 					UStaticMeshComponent* component = staticMeshComponents[0];
 					UMaterialInstanceDynamic * DynamicMaterial = UMaterialInstanceDynamic::Create(component->GetMaterial(0), nullptr);
 					DynamicMaterial->SetVectorParameterValue("Color", blockColor);
-					component->SetMaterial(0, DynamicMaterial);
+					component->SetMaterial(0, DynamicMaterial);*/
 				}
 				else {
 					//this is a normal block
@@ -147,6 +149,22 @@ void AMapController::placeBlocks_Implementation() {
 		}
 	}
 }
+
+void AMapController::changeStrongholdColor_Implementation(AStronghold* stronghold, FLinearColor blockColor) {
+	TArray<UStaticMeshComponent*> staticMeshComponents;
+	stronghold->GetComponents<UStaticMeshComponent>(staticMeshComponents);
+	UStaticMeshComponent* component = staticMeshComponents[0];
+	UMaterialInstanceDynamic * DynamicMaterial = UMaterialInstanceDynamic::Create(component->GetMaterial(0), nullptr);
+	DynamicMaterial->SetVectorParameterValue("Color", blockColor);
+	component->SetMaterial(0, DynamicMaterial);
+}
+
+/*bool AMapController::changeStrongholdColor_Validate(AStronghold* stronghold, FLinearColor blockColor)
+{
+	// Optionally validate the request and return false if the function should not be run.
+	return true;
+}*/
+
 bool AMapController::placeBlocks_Validate() {
 	return true;
 }
