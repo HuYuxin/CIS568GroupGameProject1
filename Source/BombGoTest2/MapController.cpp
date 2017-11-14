@@ -114,32 +114,32 @@ void AMapController::placeBlocks_Implementation() {
 				int yShift = FCString::Atoi(*(xyPos[1]));
 				
 				
-				if (xyPos.Num() > 2) {
-					//this is a stronghold
-					int idx= FCString::Atoi(*(xyPos[2]));
-					AStronghold* stronghold = (AStronghold*)World->SpawnActor<AStronghold>(strongholdClass, FVector(xShift * TILESIZE, yShift * TILESIZE, 0), FRotator(0.f));
-					FLinearColor blockColor = FLinearColor();
-					stronghold->id = idx;
-					if (xShift > 8) {
-						blockColor = FLinearColor::Red;
-					}
-					else {
-						blockColor = FLinearColor::Blue;
-					}
-					changeStrongholdColor(stronghold, blockColor);
+				//if (xyPos.Num() > 2) {
+				//	//this is a stronghold
+				//	int idx= FCString::Atoi(*(xyPos[2]));
+				//	AStronghold* stronghold = (AStronghold*)World->SpawnActor<AStronghold>(strongholdClass, FVector(xShift * TILESIZE, yShift * TILESIZE, 0), FRotator(0.f));
+				//	FLinearColor blockColor = FLinearColor();
+				//	stronghold->id = idx;
+				//	if (xShift > 8) {
+				//		blockColor = FLinearColor::Red;
+				//	}
+				//	else {
+				//		blockColor = FLinearColor::Blue;
+				//	}
+				//	changeStrongholdColor(stronghold, blockColor);
 
-					/*TArray<UStaticMeshComponent*> staticMeshComponents;
-					stronghold->GetComponents<UStaticMeshComponent>(staticMeshComponents);
-					UStaticMeshComponent* component = staticMeshComponents[0];
-					UMaterialInstanceDynamic * DynamicMaterial = UMaterialInstanceDynamic::Create(component->GetMaterial(0), nullptr);
-					DynamicMaterial->SetVectorParameterValue("Color", blockColor);
-					component->SetMaterial(0, DynamicMaterial);*/
-				}
-				else {
+				//	/*TArray<UStaticMeshComponent*> staticMeshComponents;
+				//	stronghold->GetComponents<UStaticMeshComponent>(staticMeshComponents);
+				//	UStaticMeshComponent* component = staticMeshComponents[0];
+				//	UMaterialInstanceDynamic * DynamicMaterial = UMaterialInstanceDynamic::Create(component->GetMaterial(0), nullptr);
+				//	DynamicMaterial->SetVectorParameterValue("Color", blockColor);
+				//	component->SetMaterial(0, DynamicMaterial);*/
+				//}
+				//else {
 					//this is a normal block
 					AMapBlock* block = (AMapBlock*)World->SpawnActor<AMapBlock>(mapBlockClass, FVector(xShift * TILESIZE, yShift * TILESIZE, 0), FRotator(0.f));
 					block->initBlock(BlockTypeEnum::BT_Normal, 0);
-				}
+				//}
 
 				//Assign a color to static mesh component (which is a block)
 
